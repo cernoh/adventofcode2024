@@ -24,37 +24,27 @@ std::vector<std::vector<int>> readFileToVector(const std::string &filename) {
 }
 
 int main() {
-  std::string filename = "test.txt";
+  std::string filename = "input.txt";
   std::vector<std::vector<int>> data = readFileToVector(filename);
 
   int total = 0;
 
   for (const auto &row : data) {
     bool readable = true;
-    bool incrementing = false;
-    if (row[0] < row[1]) {
-      incrementing = true;
-    }
-    int prev_number = -1;
-    for (const auto &number : row) {
-      if (prev_number == -1) {
-        prev_number = number;
-        continue;
-      }
-      if (incrementing && number < prev_number ||
-          !incrementing && number > prev_number) {
+    bool incrementing = row[0] < row[1];
+    int prev_number = row[0];
+
+    for (size_t i = 1; i < row.size(); ++i) {
+      int number = row[i];
+      if ((incrementing && number <= prev_number) ||
+          (!incrementing && number >= prev_number) ||
+          abs(number - prev_number) > 3) {
         readable = false;
         break;
       }
-      if ((incrementing &&
-           (number - prev_number <= 0 || number - prev_number > 3)) ||
-          (!incrementing &&
-           (prev_number - number <= 0 || prev_number - number > 3)) ||
-          (abs(number - prev_number) < 1)) {
-        readable = false;
-        break;
-      }
+      prev_number = number;
     }
+
     if (readable) {
       total++;
     }
