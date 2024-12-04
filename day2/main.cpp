@@ -60,7 +60,7 @@ int part2(std::string &filename) {
 
   for (const auto &row : data) {
     bool readable = true;
-    bool safety = true;
+    bool skip = false;
     bool incrementing = row[0] < row[1];
     int prev_number = row[0];
 
@@ -69,12 +69,12 @@ int part2(std::string &filename) {
       if ((incrementing && number <= prev_number) ||
           (!incrementing && number >= prev_number) ||
           abs(number - prev_number) > 3) {
-        if (!safety) {
-          readable = false;
+        if (abs(number - row[i + 1]) > 3) {
+          skip = true;
           break;
-        } else {
-          safety = false;
         }
+        readable = false;
+        break;
       }
       prev_number = number;
     }
