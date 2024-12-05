@@ -47,38 +47,48 @@ void part1() {
   outfile.close();
 }
 
+void edit_map(std::map<int, int> &map, std::vector<int> &opposite_vector) {
+
+  for (auto &nums : opposite_vector) {
+    if (map.find(nums) != map.end()) {
+      map[nums] += 1;
+    }
+  }
+}
+
+std::map<int, int> return_map(std::vector<int> vector,
+                              std::vector<int> opposite_vector) {
+  std::map<int, int> map;
+  for (auto &num : vector) {
+    if (map.find(num) == map.end()) {
+      map[num] = 0;
+    }
+  }
+  edit_map(map, opposite_vector);
+  return map;
+}
+
+int combine_map(std::map<int, int> &map, std::vector<int> &vec) {
+  int total = 0;
+  for (const auto &num : vec) {
+    if (map.find(num) != map.end()) {
+      total += map[num] * num;
+    }
+  }
+  return total;
+}
+
 void part2() {
   std::vector<int> left_numbers;
   std::vector<int> right_numbers;
-  readfile("test.txt", left_numbers, right_numbers);
+  readfile("input.txt", left_numbers, right_numbers);
 
   std::sort(left_numbers.begin(), left_numbers.end());
   std::sort(right_numbers.begin(), right_numbers.end());
+  std::map<int, int> left_numbers_map = return_map(left_numbers, right_numbers);
 
-  std::map<int, int> left_numbers_map;
-  std::map<int, int> right_numbers_map;
-
-  for (auto num : left_numbers) {
-    if (left_numbers_map.find(num) == left_numbers_map.end()) {
-      left_numbers_map[num] = 1;
-    } else {
-      left_numbers_map[num]++;
-    }
-  }
-
-  for (auto num : right_numbers) {
-    if (right_numbers_map.find(num) == right_numbers_map.end()) {
-      right_numbers_map[num] = 1;
-    } else {
-      right_numbers_map[num]++;
-    }
-  }
-
-  int total = mapstore(left_numbers_map) + mapstore(right_numbers_map);
-
-  std::ofstream outfile("output.txt");
-  outfile << std::fixed << std::setprecision(0) << total << std::endl;
-  outfile.close();
+  int total = combine_map(left_numbers_map, left_numbers);
+  std::cout << std::fixed << std::setprecision(0) << total << std::endl;
 }
 
 int main() {

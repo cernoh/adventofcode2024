@@ -23,7 +23,11 @@ std::vector<std::vector<int>> readFileToVector(const std::string &filename) {
 
   return result;
 }
-
+bool isReadable(int number, int prev_number, bool incrementing) {
+  return !((incrementing && number <= prev_number) ||
+           (!incrementing && number >= prev_number) ||
+           abs(number - prev_number) > 3);
+}
 int part1(std::string &filename) {
   std::vector<std::vector<int>> data = readFileToVector(filename);
 
@@ -36,9 +40,7 @@ int part1(std::string &filename) {
 
     for (size_t i = 1; i < row.size(); ++i) {
       int number = row[i];
-      if ((incrementing && number <= prev_number) ||
-          (!incrementing && number >= prev_number) ||
-          abs(number - prev_number) > 3) {
+      if (!(isReadable(number, prev_number, incrementing))) {
         readable = false;
         break;
       }
@@ -60,18 +62,19 @@ int part2(std::string &filename) {
 
   for (const auto &row : data) {
     bool readable = true;
-    bool skip = false;
     bool incrementing = row[0] < row[1];
     int prev_number = row[0];
+    bool single_bad_level = false;
 
     for (size_t i = 1; i < row.size(); ++i) {
       int number = row[i];
-      if ((incrementing && number <= prev_number) ||
-          (!incrementing && number >= prev_number) ||
-          abs(number - prev_number) > 3) {
-        if (abs(number - row[i + 1]) > 3) {
-          skip = true;
-          break;
+      if (!(isReadable(number, prev_number, incrementing))) {
+        if (isReadable(row[i + 1], prev_number, incrementing) &&
+            !single_bad_level) {
+          single_bad_level = true;
+          prev_number = number;
+          i += 1;
+          continue;
         }
         readable = false;
         break;
